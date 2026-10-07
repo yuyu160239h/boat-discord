@@ -32,12 +32,18 @@ def program(day):
 
 
 def post(text):
-    url = os.environ.get("DISCORD_WEBHOOK", "").strip()
-    if not url:
-        print(text)
-        return
-    body = json.dumps({"content": text[:1900]}).encode()
-    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
+    url = os.environ.get("DISCORD_WEBHOOK", "").strip().strip("\"'")
+    if not url.startswith("https://discord.com/api/webhooks/") and not url.startswith("https://discordapp.com/api/webhooks/"):
+        raise SystemExit("DISCORD_WEBHOOK がウェブフックURLではありません")
+    body = json.dumps({"content": text[:1900], "username": "Spidey Bot"}).encode()
+    req = urllib.request.Request(
+        url,
+        data=body,
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "boat-discord (https://github.com/yuyu160239h/boat-discord)",
+        },
+    )
     urllib.request.urlopen(req, timeout=30).read()
 
 
